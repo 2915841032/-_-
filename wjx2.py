@@ -37,7 +37,6 @@ from selenium.webdriver.common.by import By
 以便祭奠我死去的10086根头发呜呜呜。当然不给也可以用喔。谢谢大大！谢谢大大！
 """
 
-
 """
 获取代理ip，这里要使用到一个叫“品赞ip”的第三方服务: https://www.ipzan.com?pid=ggj6roo98
 注册，需要实名认证（这是为了防止你用代理干违法的事，相当于网站的免责声明，属于正常步骤，所有代理网站都会有这一步）
@@ -46,6 +45,8 @@ from selenium.webdriver.common.by import By
 设置完成后，不要问为什么和视频教程有点不一样，因为与时俱进！(其实是因为懒，毕竟代码改起来容易，视频录起来不容易嘿嘿2023.10.29)
 如果不需要ip可不设置，也不影响此程序直接运行（悄悄提醒，品赞ip每周可以领3块钱）
 """
+
+
 def zanip():
     # 这里放你的ip链接，选择你想要的地区，1分钟，ip池无所谓，数据格式txt，提取数量1，其余默认即可
     api = "https://service.ipzan.com/core-extract?num=1&no=???&minute=1&area=all&pool=quality&secret=???"
@@ -54,7 +55,7 @@ def zanip():
 
 
 # 示例问卷,试运行结束后,需要改成你的问卷地址
-url = 'https://www.wjx.cn/vm/OM6GYNV.aspx#'
+url = 'https://www.wjx.cn/vm/mSTa1oc.aspx#'
 
 """
 单选题概率参数，"1"表示第一题，0表示不选， [30, 70]表示3:7，-1表示随机
@@ -63,16 +64,19 @@ url = 'https://www.wjx.cn/vm/OM6GYNV.aspx#'
 最重要的其实是保证single_prob的第n个参数对应第n个单选题，比如在示例问卷中第5题是滑块题，但是我single_prob却有“第5题”，因为这个"5"其实对应的是第5个单选题，也就是问卷中的第6题
 这个single_prob的"5"可以改成其他任何值，当然我不建议你这么干，因为问卷中只有5个单选题，所以第6个单选题的参数其实是没有用上的，参数只能多不能少！！！（这一点其他类型的概率参数也适用）
 """
-single_prob = {"1": [1, 1, 0], "2": -1, "3": -1, "4": -1, "5": -1, "6": [1, 0], }
+single_prob = {"1": [1, 1], "2": [1, 1, 1, 1], "3": [1, 1, 1, 1], "4": [1, 1, 1], "5": [1, 1, 1, 0], "6": [1, 1, 1, 1],
+               "7": [1, 1], "8": [1, 1, 1, 1], "9": [1, 1, 1, 1, 1], "10": [1, 1, 1, 1, 1], "11": [1, 1, 1],
+               "12": [1, 1 ], "13": [1, 1, 1], "14": [1, 1, 1, 1], "15": [1, 1, 1], "16": [1, 1, 1, 1],
+               "17": [1, 1, 1, 1] }
 
 # 下拉框参数，具体含义参考单选题，如果没有下拉框题也不要删，就让他躺在这儿吧，其他题也是哦，没有就不动他，别删，只改你有的题型的参数就好啦
 droplist_prob = {"1": [2, 1, 1]}
 
 # 多选题概率参数,0不选该选项，100必选，[10, 50]表示1:5,-1表示随机，
-multiple_prob = {"9": [100, 2, 1, 1]}
+multiple_prob = {"18": [100, 2, 1, 1, 1, 1, 1], "19": [100, 2, 1, 1, 1], "20": [100, 2, 1, 1, 1, 1]}
 # 多选题选择的选项数量（去除必选后的数），这里填1与上面的multiple_prob表示在必选A后，会再从BCD中选1个选项
 # 注意！！！如果选项数量比较少，建议多选的数量参数不要太大，因为数量参数值越大，最后刷出来的数据分布误差越大！！！4个选项建议选1-2个即可。
-multiple_opts = {"9": 1, }
+multiple_opts = {"18": 1, "19": 1, "20": 1}
 
 # 矩阵题概率参数,-1表示随机，其他含义参考单选题；同样的，题号不重要，保证第几个参数对应第几个矩阵小题就可以了；
 # 在示例问卷中矩阵题是第10题，每个小题都要设置概率值才行！！以下参数表示第二题随机，其余题全选A
@@ -228,6 +232,7 @@ def multiple(driver, current, index):
                                 f'#div{current} > div.ui-controlgroup > div:nth-child({i + 1})').click()
 
 
+
 # 矩阵题处理函数
 def matrix(driver, current, index):
     xpath1 = f'//*[@id="divRefTab{current}"]/tbody/tr'
@@ -240,7 +245,9 @@ def matrix(driver, current, index):
     xpath2 = f'//*[@id="drv{current}_1"]/td'
     b = driver.find_elements(By.XPATH, xpath2)  # 题的选项数量+1 = 6
     # 遍历每一道小题
+
     for i in range(1, q_num + 1):
+        time.sleep(2)
         p = matrix_prob[index]
         index += 1
         if p == -1:
@@ -248,6 +255,7 @@ def matrix(driver, current, index):
         else:
             opt = numpy.random.choice(a=numpy.arange(2, len(b) + 1), p=p)
         driver.find_element(By.CSS_SELECTOR, f'#drv{current}_{i} > td:nth-child({opt})').click()
+
     return index
 
 
@@ -402,15 +410,15 @@ if __name__ == "__main__":
     # 需要几个窗口同时刷就设置几个thread_?，默认两个，args里的数字表示设置浏览器窗口打开时的初始xy坐标
     thread_1 = Thread(target=run, args=(50, 50))
     thread_2 = Thread(target=run, args=(650, 50))
-    # thread_3 = Thread(target=run, args=(650, 280))
+    thread_3 = Thread(target=run, args=(650, 280))
 
     thread_1.start()
     thread_2.start()
-    # thread_3.start()
+    thread_3.start()
 
     thread_1.join()
     thread_2.join()
-    # thread_3.join()
+    thread_3.join()
 
 """
     总结,你需要修改的有: 1 每个题的比例参数(必改)  2 问卷链接(必改)  3 ip链接(可选)  4 浏览器窗口数量(可选)
