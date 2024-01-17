@@ -50,8 +50,9 @@ from selenium.webdriver.common.by import By
 def zanip():
     # 这里放你的ip链接，选择你想要的地区，1分钟，ip池无所谓，数据格式txt，提取数量1，其余默认即可
     api = "https://service.ipzan.com/core-extract?num=1&no=???&minute=1&area=all&pool=quality&secret=???"
-    ip = requests.get(api).text
-    return ip
+    from 测试ip是否能用.爬取 import get_proxy
+    res = get_proxy()
+    return res
 
 
 # 示例问卷,试运行结束后,需要改成你的问卷地址
